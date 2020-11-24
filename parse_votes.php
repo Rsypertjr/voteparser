@@ -182,8 +182,7 @@
         xmlhttp.send();
 
         function vue_obj(){
-
-              
+                                
                         // Vue Object
                         vm = new Vue({
                         el: '#results_table',
@@ -195,7 +194,11 @@
 
                             blheaders: ["Trump Votes","Trump Vote Increase","1st Index","2nd Index", "Other Votes","1st Biden Votes","2nd Biden Votes",
                                         "Biden Vote Loss","Accumulated Biden Vote Loss","Votes Increase + Biden Loss","Last Vote Total", "Overall Vote Increase"],     
-                            states: ["Pennsylvania","Michigan"],      
+                            states: ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho",
+                                        "Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota",
+                                        "Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina",
+                                        "North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee",
+                                        "Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"],      
                             row: '',
                             header: '',
                             cell:'',
@@ -240,28 +243,68 @@
                                 this.stackedchart();
                                
                             },
-                            vote_rows : function(val){
-                                setTimeout(function(){ 
-                                    $("table.display").show(); 
-                                }, 1000);
-                            },
-                            state_selected : function(val){
-                                this.start_tables(val);    
                            
-
-
+                            state_selected : function(val){
+                                $("#results_table").css("display","none");
+                                this.start_tables(val);   
                             }
                         },
                                                  
                         mounted: function() {                           
-                            this.start_tables(this.state_selected);    
-                            //this.start_tables("Michigan");                       
+                            this.start_tables(this.state_selected);                                
+
+                            var this2 = this;
+                            $("table.display").on( 'page.dt', function () {
+                                var info = table.page.info();
+                                $('#pageInfo').html( 'Showing page: '+info.page+' of '+info.pages );
+                                this2.selectedindex = info.page;
+                                this2.linechart();
+
+                                this2.piechart();
+                                this2.stackedchart();
+                            } );
+
+                            $('#lineChart').on('click',function(){
+                            
+                                if($(this).parent().parent().find('#flinec').hasClass('col-sm-12')){
+                                    $(this).parent().parent().find('#flinec').removeClass('col-sm-12').addClass('col-sm-4');
+                                    $(this).parent().parent().find('#fpiec').add('#fstackedc').show();
+                                } 
+                                else{
+                                    $(this).parent().parent().find('#fpiec').add('#fstackedc').hide();
+                                    $(this).parent().parent().find('#flinec').removeClass('col-sm-4').addClass('col-sm-12');
+                                }
+                            });
+
+                            $('#pieChart').on('click',function(){
+                                //alert('ok');
+                                if($('#fpiec').hasClass('col-sm-12')){
+                                    $('#fpiec').removeClass('col-sm-12').addClass('col-sm-4');
+                                    $('#flinec').add('#fstackedc').show();
+                                } 
+                                else{
+                                    $('#flinec').add('#fstackedc').hide();
+                                    $('#fpiec').removeClass('col-sm-4').addClass('col-sm-12');
+                                }
+                            });
+                        
+                            $('#stackedChart').on('click',function(){
+                                //alert('ok');
+                                if($('#fstackedc').hasClass('col-sm-12')){
+                                    $('#fstackedc').removeClass('col-sm-12').addClass('col-sm-4');
+                                    $('#flinec').add('#fpiec').show();
+                                } 
+                                else{
+                                    $('#flinec').add('#fpiec').hide();
+                                    $('#fstackedc').removeClass('col-sm-4').addClass('col-sm-12');
+                                }
+                            });
+                                
                         },
                       
                         methods: {
                             // Mapping Function Used for calculating when vote total decreases and the accumulation
                             get_data: function(state){
-                              $("table.display").hide(); 
                               var this2 = this;
                               var getdata =  xmlhttp.onreadystatechange = function() {
                                 if (this.readyState == 4 && this.status == 200) {
@@ -359,20 +402,20 @@
                                     console.log("Total Votes:",pres_votes);
 
                                     // Final Format Display Rows of Votes
-                                    this2.vote_rows = pres_votes.map(function(vote,index){                            
+                                    var temp_rows = pres_votes.map(function(vote,index){                            
                                     //return {"votes":vote.votes,"timestamp":vote.timestamp,"bidenj":vote.bidenj,"trumpd":vote.trumpd};
                                     return vote;
                                     }).sort(function(a, b){return a.votes - b.votes});
 
-                                    this2.vote_rows = pres_votes.map(function(vote,index){
+                                    table = $("table.display").DataTable();
+
+                                    this2.vote_rows = temp_rows.map(function(vote,index){
                                         return {"index":index,"bidenj":vote.bidenj,"biden_votes":vote.biden_votes,"trumpd":vote.trumpd,"trump_votes":vote.trump_votes,"other_votes":vote.other_votes,"timestamp":vote.timestamp,"votes":vote.votes,"vote_add":vote.total_vote_add,"trump_added":vote.total_vote_add_trump,
                                             "biden_added":vote.total_vote_add_biden };
                                     });
                                     console.log("Vote Rows:", this2.vote_rows);
-                                    this2.parse_vote();
-                                    this2.linechart();
-                                    this2.piechart();
-                                    this2.stackedchart();
+                                    
+                                    
                                     
                                 }
                                 
@@ -382,65 +425,29 @@
                             
                             },
                             start_tables: function(state){
-                                if(table){
-                                    table.destroy();
-                                }
-                                setTimeout(function(){ 
-                                    table = $("table.display").DataTable();                                     
-                                }, 500);
                                 
-                                this.get_data(state);
+                                if(table){
+                                   table.destroy();
+                               }
+                                
+                                this.get_data(state);  
+                                setTimeout(function(){ 
+                                    $('#results_table').show();
+                                    table.draw();
+                                   
+                                }, 1000);
+
+                                
                                 this.parse_vote();
                                 this.linechart();
                                 this.piechart();
-                                this.stackedchart();
-                                var this2 = this;
+                                this.stackedchart();  
+                               
+                                
+                                
+                                
                                 $('#pieheader').css('display','block');
-                                $("table.display").on( 'page.dt', function () {
-                                    var info = table.page.info();
-                                    $('#pageInfo').html( 'Showing page: '+info.page+' of '+info.pages );
-                                    this2.selectedindex = info.page;
-                                    this2.linechart();
-
-                                    this2.piechart();
-                                    this2.stackedchart();
-                                } );
-
-                                $('#lineChart').on('click',function(){
-                                    //alert('ok');
-                                    if($('#flinec').hasClass('col-sm-12')){
-                                        $('#flinec').removeClass('col-sm-12').addClass('col-sm-4');
-                                        $('#fpiec').add('#fstackedc').show();
-                                    } 
-                                    else{
-                                        $('#fpiec').add('#fstackedc').hide();
-                                        $('#flinec').removeClass('col-sm-4').addClass('col-sm-12');
-                                    }
-                                });
-
-                                $('#pieChart').on('click',function(){
-                                    //alert('ok');
-                                    if($('#fpiec').hasClass('col-sm-12')){
-                                        $('#fpiec').removeClass('col-sm-12').addClass('col-sm-4');
-                                        $('#flinec').add('#fstackedc').show();
-                                    } 
-                                    else{
-                                        $('#flinec').add('#fstackedc').hide();
-                                        $('#fpiec').removeClass('col-sm-4').addClass('col-sm-12');
-                                    }
-                                });
-                            
-                                $('#stackedChart').on('click',function(){
-                                    //alert('ok');
-                                    if($('#fstackedc').hasClass('col-sm-12')){
-                                        $('#fstackedc').removeClass('col-sm-12').addClass('col-sm-4');
-                                        $('#flinec').add('#fpiec').show();
-                                    } 
-                                    else{
-                                        $('#flinec').add('#fpiec').hide();
-                                        $('#fstackedc').removeClass('col-sm-4').addClass('col-sm-12');
-                                    }
-                                });
+                               
                                 
                             },
                             parse_vote: function(){
@@ -970,6 +977,10 @@
             text-align:center;
             display:none
         } 
+
+        #results_table{
+            display:none
+        }
     
 
         [v-cloak] > * { display:none; }
@@ -1022,10 +1033,7 @@
                         </tr>  
                     </tbody>
                 </table>
-                <br>
-                <h1 class="voteloss">Biden Vote Loss Data</h1>
-                <table id="bidenvloss"  v-if = "biden_votes_decrease.length > 0 && blheaders.length > 0" class='table table-striped table-bordered'  style='width:100%'>
-                    <thead> 
+                <br>table.display
                         <tr>
                             <th class="th-sm" v-for="header in blheaders">{{header}}</th>
                         </tr>
