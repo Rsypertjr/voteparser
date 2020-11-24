@@ -226,7 +226,7 @@
                             the_pieheader:null,
                             the_stackedheader:null,
                             res_selected:0,
-                            state_selected:'',
+                            state_selected:'Michigan',
                             selected:'1 Times',
                             ttable:''
                         },
@@ -254,13 +254,13 @@
                         },
                                                  
                         mounted: function() {                           
-                            this.start_tables();    
+                            this.start_tables(this.state_selected);    
                             //this.start_tables("Michigan");                       
                         },
                       
                         methods: {
                             // Mapping Function Used for calculating when vote total decreases and the accumulation
-                            get_data: function(state = null){
+                            get_data: function(state){
                               $("table.display").hide(); 
                               var this2 = this;
                               var getdata =  xmlhttp.onreadystatechange = function() {
@@ -381,7 +381,7 @@
                             xmlhttp.send();   
                             
                             },
-                            start_tables: function(state="Pennsylvania"){
+                            start_tables: function(state){
                                 if(table){
                                     table.destroy();
                                 }
