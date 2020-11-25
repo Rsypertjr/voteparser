@@ -55,6 +55,7 @@
                 var rows = {};
                 var xmlhttp = new XMLHttpRequest();
                 var myLineChart = null;
+                var myLineChart2 = null;
                 var myPieChart = null;
                 var myStackedChart = null;
                 var voterows = [];
@@ -214,15 +215,21 @@
                             date_headers: [],
                             datedata_biden: [],
                             datedata_trump: [],
+                            datedata_biden_add: [],
+                            datedata_trump_add: [],
                             datedata_other: [],
+                            datedata_other_add: [],
                             biden_slices: [],
                             trump_slices: [],
                             other_slices: [],
                             total_slices: [],
                             dateheaders_store: [],
                             datedatabiden_store: [],
+                            datedatabidenadd_store: [],
                             datedatatrump_store: [],
+                            datedatatrumpadd_store: [],
                             datedataother_store: [],
+                            datedataotheradd_store: [],
                             datedatatotal_store: [],
                             parse_interval: 10,
                             pie_headers: [],
@@ -239,6 +246,7 @@
                                 this.parse_interval = parseInt(val.replace('Times','').trim())*10;
                                 this.parse_vote();
                                 this.linechart();
+                                this.linechart2();
                                 this.piechart();
                                 this.stackedchart();
                                
@@ -259,7 +267,7 @@
                                 $('#pageInfo').html( 'Showing page: '+info.page+' of '+info.pages );
                                 this2.selectedindex = info.page;
                                 this2.linechart();
-
+                                this2.linechart2();
                                 this2.piechart();
                                 this2.stackedchart();
                             } );
@@ -267,36 +275,48 @@
                             $('#lineChart').on('click',function(){
                             
                                 if($(this).parent().parent().find('#flinec').hasClass('col-sm-12')){
-                                    $(this).parent().parent().find('#flinec').removeClass('col-sm-12').addClass('col-sm-4');
-                                    $(this).parent().parent().find('#fpiec').add('#fstackedc').show();
+                                    $(this).parent().parent().find('#flinec').removeClass('col-sm-12').addClass('col-sm-3');
+                                    $(this).parent().parent().find('#fpiec').add('#fstackedc').add('#flinecnew').show();
                                 } 
                                 else{
-                                    $(this).parent().parent().find('#fpiec').add('#fstackedc').hide();
-                                    $(this).parent().parent().find('#flinec').removeClass('col-sm-4').addClass('col-sm-12');
+                                    $(this).parent().parent().find('#fpiec').add('#fstackedc').add('#flinecnew').hide();
+                                    $(this).parent().parent().find('#flinec').removeClass('col-sm-3').addClass('col-sm-12');
                                 }
                             });
+
+                            $('#newlineChart').on('click',function(){
+                            
+                            if($(this).parent().parent().find('#flinecnew').hasClass('col-sm-12')){
+                                $(this).parent().parent().find('#flinecnew').removeClass('col-sm-12').addClass('col-sm-3');
+                                $(this).parent().parent().find('#fpiec').add('#fstackedc').add('#flinec').show();
+                            } 
+                            else{
+                                $(this).parent().parent().find('#fpiec').add('#fstackedc').add('#flinec').hide();
+                                $(this).parent().parent().find('#flinecnew').removeClass('col-sm-3').addClass('col-sm-12');
+                            }
+                        }); 
 
                             $('#pieChart').on('click',function(){
                                 //alert('ok');
                                 if($('#fpiec').hasClass('col-sm-12')){
-                                    $('#fpiec').removeClass('col-sm-12').addClass('col-sm-4');
-                                    $('#flinec').add('#fstackedc').show();
+                                    $('#fpiec').removeClass('col-sm-12').addClass('col-sm-3');
+                                    $('#flinec').add('#fstackedc').add('#flinecnew').show();
                                 } 
                                 else{
-                                    $('#flinec').add('#fstackedc').hide();
-                                    $('#fpiec').removeClass('col-sm-4').addClass('col-sm-12');
+                                    $('#flinec').add('#fstackedc').add('#flinecnew').hide();
+                                    $('#fpiec').removeClass('col-sm-3').addClass('col-sm-12');
                                 }
                             });
                         
                             $('#stackedChart').on('click',function(){
                                 //alert('ok');
                                 if($('#fstackedc').hasClass('col-sm-12')){
-                                    $('#fstackedc').removeClass('col-sm-12').addClass('col-sm-4');
-                                    $('#flinec').add('#fpiec').show();
+                                    $('#fstackedc').removeClass('col-sm-12').addClass('col-sm-3');
+                                    $('#flinec').add('#fpiec').add('#flinecnew').show();
                                 } 
                                 else{
-                                    $('#flinec').add('#fpiec').hide();
-                                    $('#fstackedc').removeClass('col-sm-4').addClass('col-sm-12');
+                                    $('#flinec').add('#fpiec').add('#flinecnew').hide();
+                                    $('#fstackedc').removeClass('col-sm-3').addClass('col-sm-12');
                                 }
                             });
                                 
@@ -431,6 +451,7 @@
                                }
                                 
                                 this.get_data(state);  
+                                $('table.display').css('display','block');
                                 setTimeout(function(){ 
                                     $('#results_table').show();
                                     table.draw();
@@ -440,6 +461,7 @@
                                 
                                 this.parse_vote();
                                 this.linechart();
+                                this.linechart2();
                                 this.piechart();
                                 this.stackedchart();  
                                
@@ -455,20 +477,30 @@
                                    
                                     var dateheaders = [];
                                     var datedatabiden = [];
+                                    var datedatabidenadd = [];
                                     var datedatatrump = [];
+                                    var datedatatrumpadd = [];
                                     var datedatatotal = [];
                                     var datedataother = [];
+                                    var datedataotheradd = [];
                                     this.dateheaders_store = [];
                                     this.datedatabiden_store = [];
+                                    this.datedatabidenadd_store = [];
                                     this.datedatatrump_store = [];
+                                    this.datedatatrumpadd_store = [];
                                     this.datedatatotal_store = [];
                                     this.datedataother_store = [];
+                                    this.datedataotheradd_store = [];
 
                                     console.log("Parse Interval",this.parse_interval);
                                     for(i=0;i<voterows.length;i++){
                                         if(i == 0){
                                             dateheaders.push(voterows[i].timestamp);
                                             datedatabiden.push(voterows[i].biden_votes);
+                                            datedatatrump.push(voterows[i].trump_votes);
+                                            datedatabidenadd.push(voterows[i].biden_votes);
+                                            datedatatrumpadd.push(voterows[i].trump_votes);
+                                            datedataotheradd.push(voterows[i].other_votes);
                                             datedatatrump.push(voterows[i].trump_votes);
                                             datedatatotal.push(voterows[i].votes);
                                             datedataother.push(voterows[i].other_votes);
@@ -478,6 +510,9 @@
                                             datedatabiden.push(voterows[i].biden_votes);
                                             datedatatrump.push(voterows[i].trump_votes);
                                             datedataother.push(voterows[i].other_votes);
+                                            datedatabidenadd.push(voterows[i].biden_votes-voterows[i-1].biden_votes);
+                                            datedatatrumpadd.push(voterows[i].trump_votes-voterows[i-1].trump_votes);
+                                            datedataotheradd.push(voterows[i].other_votes-voterows[i-1].other_votes);
                                             datedatatotal.push(voterows[i].votes);
                                         }
                                         else if(i % this.parse_interval == 0) {
@@ -486,16 +521,25 @@
                                             datedatatrump.push(voterows[i].trump_votes);
                                             datedataother.push(voterows[i].other_votes);
                                             datedatatotal.push(voterows[i].votes);
+                                            datedatabidenadd.push(voterows[i].biden_votes-voterows[i-1].biden_votes);
+                                            datedatatrumpadd.push(voterows[i].trump_votes-voterows[i-1].trump_votes);
+                                            datedataotheradd.push(voterows[i].other_votes-voterows[i-1].other_votes);
                                             this.dateheaders_store.push(dateheaders);
                                             dateheaders = []; 
                                             this.datedatabiden_store.push(datedatabiden);
                                             datedatabiden = [];
+                                            this.datedatabidenadd_store.push(datedatabidenadd);
+                                            datedatabidenadd = [];
                                             this.datedatatrump_store.push(datedatatrump);
                                             datedatatrump = [];  
+                                            this.datedatatrumpadd_store.push(datedatatrumpadd);
+                                            datedatatrumpadd = [];  
                                             this.datedatatotal_store.push(datedatatotal);
                                             datedatatotal = []; 
                                             this.datedataother_store.push(datedataother);
-                                            datedataother = [];                                 
+                                            datedataother = [];     
+                                            this.datedataotheradd_store.push(datedataotheradd);
+                                            datedataotheradd = [];                             
                                         }
                                         else{
                                             dateheaders.push(voterows[i].timestamp);
@@ -503,6 +547,9 @@
                                             datedatatrump.push(voterows[i].trump_votes);
                                             datedataother.push(voterows[i].other_votes);
                                             datedatatotal.push(voterows[i].votes);
+                                            datedatabidenadd.push(voterows[i].biden_votes-voterows[i-1].biden_votes);
+                                            datedatatrumpadd.push(voterows[i].trump_votes-voterows[i-1].trump_votes);
+                                            datedataotheradd.push(voterows[i].other_votes-voterows[i-1].other_votes);
                                         }
 
                                     }
@@ -549,7 +596,6 @@
                                 console.log("Other Slices: ",otherslices);
                        
                             },
-                            
                             trump_decrease: function(votes,index2){
                                 if(index2 > 0 ){
                                    
@@ -819,6 +865,124 @@
                                 });
                             },
 
+                            linechart2:function(){
+                                this.date_headers = this.dateheaders_store[this.selectedindex];
+                                this.datedata_biden_add = this.datedatabidenadd_store[this.selectedindex];
+                                this.datedata_trump_add = this.datedatatrumpadd_store[this.selectedindex];
+                                this.datedata_other_add = this.datedataotheradd_store[this.selectedindex];
+                                var canvas = document.getElementById("newlineChart");
+                                var ctx = canvas.getContext('2d');
+
+                                
+
+                                // Global Options:
+                                Chart.defaults.global.defaultFontColor = 'black';
+                                Chart.defaults.global.defaultFontSize = 16;
+
+                                var data = {
+                                labels: this.date_headers,
+                                datasets: [{
+                                    label: "New Trump Votes",
+                                    fill: true,
+                                    lineTension: 0.1,
+                                    backgroundColor: "rgba(167,105,0,0.4)",
+                                    borderColor: "rgb(167, 105, 0)",
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: "white",
+                                    pointBackgroundColor: "black",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 8,
+                                    pointHoverBackgroundColor: "brown",
+                                    pointHoverBorderColor: "yellow",
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 4,
+                                    pointHitRadius: 10,
+                                    // notice the gap in the data and the spanGaps: false
+                                    data: this.datedata_trump_add,
+                                    spanGaps: false,
+                                    },{
+                                    label: "New Biden Votes",
+                                    fill: false,
+                                    lineTension: 0.1,
+                                    backgroundColor: "rgba(225,0,0,0.4)",
+                                    borderColor: "red", // The main line color
+                                    borderCapStyle: 'square',
+                                    borderDash: [], // try [5, 15] for instance
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: "black",
+                                    pointBackgroundColor: "white",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 8,
+                                    pointHoverBackgroundColor: "yellow",
+                                    pointHoverBorderColor: "brown",
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 4,
+                                    pointHitRadius: 10,
+                                    // notice the gap in the data and the spanGaps: true
+                                    data: this.datedata_biden_add,
+                                    spanGaps: true,
+                                    }, {
+                                    label: "New Other Votes",
+                                    fill: true,
+                                    lineTension: 0.1,
+                                    backgroundColor: "rgba(86,105,0,0.4)",
+                                    borderColor: "rgb(86, 105, 0)",
+                                    borderCapStyle: 'butt',
+                                    borderDash: [],
+                                    borderDashOffset: 0.0,
+                                    borderJoinStyle: 'miter',
+                                    pointBorderColor: "white",
+                                    pointBackgroundColor: "black",
+                                    pointBorderWidth: 1,
+                                    pointHoverRadius: 8,
+                                    pointHoverBackgroundColor: "brown",
+                                    pointHoverBorderColor: "yellow",
+                                    pointHoverBorderWidth: 2,
+                                    pointRadius: 4,
+                                    pointHitRadius: 10,
+                                    // notice the gap in the data and the spanGaps: false
+                                    data: this.datedata_other_add,
+                                    spanGaps: false,
+                                    }
+
+                                ]
+                                };
+
+                                // Notice the scaleLabel at the same level as Ticks
+                                var options = {
+                                scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    beginAtZero:true
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: 'New Vote Totals',
+                                                    fontSize: 20 
+                                                }
+                                            }]            
+                                        }  
+                                };
+
+                                if(myLineChart2){
+                                    myLineChart2.destroy();
+                                }
+                                // Chart declaration:
+                                myLineChart2 = new Chart(ctx, {
+                                    type: 'line',
+                                    data: data,
+                                    options: options
+                                    });
+                            },
+
+
+    
+
+
                         piechart: function(){
                             var oilCanvas = document.getElementById("pieChart");
 
@@ -1082,14 +1246,17 @@
                 <br />
                 <br />
                 <div class="row" id="multiple">
-                    <div id="flinec" class="col-sm-4">
+                    <div id="flinec" class="col-sm-3">
                         <canvas id="lineChart" class="achart"></canvas>
                     </div>
-                    <div id="fpiec" class="col-sm-4">
+                    <div id="flinecnew" class="col-sm-3">
+                        <canvas id="newlineChart" class="achart"></canvas>
+                    </div>
+                    <div id="fpiec" class="col-sm-3">
                         <h3 id="pieheader" v-cloak>{{ the_pieheader }}</h3>
                         <canvas id="pieChart" class="achart"></canvas>
                     </div>
-                    <div id="fstackedc" class="col-sm-4">
+                    <div id="fstackedc" class="col-sm-3">
                         <h1 id="stackedheader" v-cloak>{{ the_stackedheader }}</h1>
                         <canvas id="stackedChart" class="achart"></canvas>
                     </div>
