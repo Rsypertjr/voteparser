@@ -179,7 +179,7 @@
             }
             
         };
-        xmlhttp.open("GET", "get_votes.php?state=Michigan", true);
+        xmlhttp.open("GET", "getdata/Michigan", true);
         xmlhttp.send();
 
         function vue_obj(){
@@ -255,7 +255,15 @@
                             state_selected : function(val){
                                 $("#results_table").css("display","none");
                                 this.start_tables(val);   
+                            },
+                            vote_rows: function(val){
+                                this.parse_vote();
+                                this.linechart();
+                                this.linechart2();
+                                this.piechart();
+                                this.stackedchart();
                             }
+
                         },
                                                  
                         mounted: function() {                           
@@ -440,7 +448,7 @@
                                 }
                                 
                             };
-                            xmlhttp.open("GET", "get_votes.php?state="+state, true);
+                            xmlhttp.open("GET", "getdata/"+state, true);
                             xmlhttp.send();   
                             
                             },
@@ -459,11 +467,11 @@
                                 }, 1000);
 
                                 
-                                this.parse_vote();
-                                this.linechart();
-                                this.linechart2();
-                                this.piechart();
-                                this.stackedchart();  
+                                //this.parse_vote();
+                                //this.linechart();
+                                //this.linechart2();
+                                //this.piechart();
+                                //this.stackedchart();  
                                
                                 
                                 
